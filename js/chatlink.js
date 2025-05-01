@@ -1,4 +1,16 @@
 async function returnContentType(url) {
+    const userUrl = new URL(request.url);
+    
+const allowedExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
+const pathname = userUrl.pathname.toLowerCase();
+const isAllowed = allowedExtensions.some(ext => pathname.endsWith(ext));
+
+if (!isAllowed) {
+  return new Response("Unsupported file type", { status: 415 });
+} else {
+    return "image/png"
+}
+    
     try {
         const response = await fetch(url, { method: 'HEAD' });
         const contentType = response.headers.get('Content-Type');
