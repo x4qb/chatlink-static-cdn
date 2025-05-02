@@ -137,8 +137,21 @@ async function bcMessage(supabaseVar, room) {
     const content = messageInput.value.trim();
 
     if (!content) return;
+    function escapeHtml(unsafe) {
+      return unsafe.replace(/[&<>"']/g, function (match) {
+        const escapeChars = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;',
+        };
+        return escapeChars[match];
+      });
+    }
 
-    const { error } = await supabaseVar.from('messages').insert([{ content, room }]);
+    const escape = escapeHtml(content);
+    const { error } = await supabaseVar.from('messages').insert([{ escape, room }]);
 
     const requestBody = { content, room };
 
