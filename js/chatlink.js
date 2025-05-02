@@ -134,7 +134,7 @@ async function bcMessage(supabaseVar, room) {
     const messagesContainer = document.getElementById('messages');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
-    const content = messageInput.value.trim();
+    let content = messageInput.value.trim();
 
     if (!content) return;
     function escapeHtml(unsafe) {
@@ -150,8 +150,8 @@ async function bcMessage(supabaseVar, room) {
       });
     }
 
-    const escape = escapeHtml(content);
-    const { error } = await supabaseVar.from('messages').insert([{ escape, room }]);
+    content = escapeHtml(content);
+    const { error } = await supabaseVar.from('messages').insert([{ content, room }]);
 
     const requestBody = { content, room };
 
