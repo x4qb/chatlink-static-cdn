@@ -5,7 +5,7 @@ let socket;
 async function returnContentType(url) {
   try {
     const response = await fetch(url, {
-      method: 'HEAD',
+      method: 'GET',
     });
 
     if (response.ok) {
