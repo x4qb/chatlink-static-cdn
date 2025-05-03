@@ -127,7 +127,14 @@ async function receiveMessage(content, roomName) {
         Your browser does not support the audio element.
       </audio>
     `;
-  } else if (contentType.startsWith('video/')) {
+  } else if (contentType === 'text/html-link') {
+  msg.innerHTML = `
+    <div class="chat-message">${realText}</div>
+    <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">
+      Click here to view the webpage
+    </a>
+  `;
+} else if (contentType.startsWith('video/')) {
     msg.className = 'video-message';
     msg.innerHTML = `
       <div class="chat-message">${realText}</div>
