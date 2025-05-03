@@ -74,13 +74,10 @@ async function receiveMessage(content, roomName) {
   const contentType = await returnContentType(firstUrl);
   if (firstUrl && typeof contentType === 'string' && contentType.startsWith('image/')) {
     msg.className = 'image-message';
-    // Add a unique query parameter to the image URL to prevent caching
-    const noCacheUrl = `${firstUrl}?nocache=${Date.now()}`;
-
     msg.innerHTML = `
       <div class="chat-message">${realText}</div>
       <img 
-        src="${noCacheUrl}" 
+        src="${firstUrl}" 
         alt="User sent image" 
         class="image-message" 
         onerror="this.onerror=null; this.src='/cdn/images/error.png';"
