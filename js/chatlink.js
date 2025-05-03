@@ -20,6 +20,25 @@ async function returnContentType(url) {
   }
 }
 
+async function fetchResource(url) {
+  try {
+    const response = await fetch(url, { method: 'GET' });
+
+    if (response.ok) {
+      const contentType = response.headers.get('Content-Type');
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      return { contentType, objectUrl };
+    } else {
+      console.error('Failed to fetch resource:', response.status, response.statusText);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching resource:', error);
+    return null;
+  }
+}
+
 
 function extractFirstUrl(content) {
   const urlPattern = /https?:\/\/[^\s]+/;
@@ -71,47 +90,58 @@ async function receiveMessage(content, roomName) {
     document.title = `(${unread}) Chatlink - ${roomName}`;
   }
 
-  const contentType = await returnContentType(firstUrl);
-  if (firstUrl && typeof contentType === 'string' && contentType.startsWith('image/')) {
+  const resource = await fetchResource(firstUrl);
+  if (!resource) return;
+
+  const { contentType, objectUrl } = resource;
+
+  if (contentType.startsWith('image/')) {
     msg.className = 'image-message';
     msg.innerHTML = `
       <div class="chat-message">${realText}</div>
       <img 
-        src="${firstUrl}" 
+        src="${objectUrl}" 
         alt="User sent image" 
-        class="image-message" 
+        class="image-message"
         onerror="this.onerror=null; this.src='/cdn/images/error.png';"
       >
     `;
-  } else if (firstUrl && typeof contentType === 'string' && contentType.startsWith('audio/')) {
+  } else if (contentType.startsWith('audio/')) {
     msg.className = 'audio-message';
     msg.innerHTML = `
       <div class="chat-message">${realText}</div>
       <audio controls>
-        <source src="${firstUrl}" type="audio/mpeg">
+        <source src="${objectUrl}" type="${contentType}">
         Your browser does not support the audio element.
       </audio>
     `;
-  } else if (firstUrl && typeof contentType === 'string' && contentType.startsWith('video/')) {
+  } else if (contentType.startsWith('video/')) {
     msg.className = 'video-message';
     msg.innerHTML = `
       <div class="chat-message">${realText}</div>
       <video controls width="300">
-        <source src="${firstUrl}" type="video/mp4">
+        <source src="${objectUrl}" type="${contentType}">
         Your browser does not support the video tag.
       </video>
     `;
-  } else if (firstUrl && typeof contentType === 'string' && contentType === 'text/html') {
-    msg.innerHTML = `
-      <div class="chat-message">${realText}</div>
-    `;
-  } else if (firstUrl && await returnContentType(firstUrl) === 'application/pdf') {
+  } else if (contentType === 'application/pdf') {
     msg.className = 'pdf-message';
     msg.innerHTML = `
       <div class="chat-message">${realText}</div>
-      <iframe src="${firstUrl}" width="100%" height="500px" style="border: none;"></iframe>
+      <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>
+    `;
+  } else if (contentType === 'text/html') {
+    msg.innerHTML = `
+      <div class="chat-message">${realText}</div>
+    `;
+  } else {
+    msg.innerHTML = `
+      <div class="chat-message">${realText}</div>
     `;
   }
+
+  // Optional cleanup: revoke object URL later if removing the message
+  // setTimeout(() => URL.revokeObjectURL(objectUrl), 60000); // for example after 1 min
 }
 
 
