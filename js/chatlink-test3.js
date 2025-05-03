@@ -174,20 +174,3 @@ async function bcMessage(room) {
     console.error('WebSocket is not open');
   }
 }
-
-// Connect WebSocket and add event listener for Send button
-document.addEventListener('DOMContentLoaded', () => {
-  const roomName = 'exampleRoom';  // Replace with the actual room name
-  connectWebSocket(roomName);
-
-  document.getElementById('sendButton').addEventListener('click', function() {
-    const messageInput = document.getElementById('messageInput');
-    const content = messageInput.value.trim();
-
-    if (!content) {
-      return;
-    }
-
-    bcMessage(roomNameVar); // Ensure roomNameVar is correctly set
-  });
-});
