@@ -149,3 +149,7 @@ body {
 .chat-input button {
 	flex-shrink: 0;
 }
+
+#imageInput {
+  display: none;
+}
