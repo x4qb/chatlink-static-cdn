@@ -138,12 +138,26 @@ function convertUrlsToLinks(text) {
   });
 }
 
+function escapeHtml(unsafe) {
+  return unsafe.replace(/[&<>"']/g, function (match) {
+    const escapeChars = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;',
+    };
+    return escapeChars[match];
+  });
+}
+
 async function bcMessage(room) {
   const messageInput = document.getElementById('messageInput');
-  const content = messageInput.value.trim();
+  let content = messageInput.value.trim();
 
   if (!content) return;
-
+  
+  content = escapeHtml(content);
   await receiveMessage(content, room);
     
   if (socket && socket.readyState === WebSocket.OPEN) {
