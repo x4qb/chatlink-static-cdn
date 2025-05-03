@@ -26,6 +26,17 @@ async function fetchResource(url) {
 
     if (response.ok) {
       const contentType = response.headers.get('Content-Type');
+
+      // 🔥 If it's a plain text response, maybe it's a returned URL
+      if (contentType === 'text/plain') {
+        const text = await response.text();
+        if (text.startsWith('http')) {
+          // The backend sent us a link instead of the file
+          return { contentType: 'text/html-link', objectUrl: text };
+        }
+      }
+
+      // Normal binary content
       const blob = await response.blob();
       const objectUrl = URL.createObjectURL(blob);
       return { contentType, objectUrl };
@@ -38,6 +49,7 @@ async function fetchResource(url) {
     return null;
   }
 }
+
 
 
 function extractFirstUrl(content) {
