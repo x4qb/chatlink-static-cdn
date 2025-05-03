@@ -239,10 +239,58 @@ async function bcMessage(room) {
   let content = messageInput.value.trim();
 
   if (!content) return;
-  
+
+  // Escape the content to prevent XSS
   const escapedContent = escapeHtml(content);
-  await receiveMessage(escapedContent, room);
-    
+
+  // Process the content for the sender to display
+  const firstUrl = extractFirstUrl(content);
+  if (firstUrl) {
+    const resource = await fetchResource(firstUrl);
+    if (resource) {
+      const { contentType, objectUrl } = resource;
+      // Create the appropriate content to be displayed
+      let messageContent = escapedContent;
+      
+      if (contentType.startsWith('image/')) {
+        messageContent = `
+          <div class="chat-message">${escapedContent}</div>
+          <img src="${objectUrl}" alt="User sent image" class="image-message" onerror="this.onerror=null; this.src='/cdn/images/error.png';">
+        `;
+      } else if (contentType.startsWith('audio/')) {
+        messageContent = `
+          <div class="chat-message">${escapedContent}</div>
+          <audio controls>
+            <source src="${objectUrl}" type="${contentType}">
+            Your browser does not support the audio element.
+          </audio>
+        `;
+      } else if (contentType.startsWith('video/')) {
+        messageContent = `
+          <div class="chat-message">${escapedContent}</div>
+          <video controls width="300">
+            <source src="${objectUrl}" type="${contentType}">
+            Your browser does not support the video tag.
+          </video>
+        `;
+      } else if (contentType === 'text/html-link') {
+        messageContent = `
+          <div class="chat-message">${escapedContent}</div>
+          <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>
+        `;
+      }
+
+      // Display the message immediately for the sender
+      const messagesContainer = document.getElementById('messages');
+      const msg = document.createElement('div');
+      msg.className = 'chat-message';
+      msg.innerHTML = messageContent;
+      messagesContainer.appendChild(msg);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  }
+
+  // Send the message to the server via WebSocket
   if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(content);
     messageInput.value = '';
@@ -250,6 +298,7 @@ async function bcMessage(room) {
     console.error('WebSocket is not open');
   }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
       const pathParts = window.location.pathname.split('/');
