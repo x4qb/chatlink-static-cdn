@@ -11,7 +11,7 @@ async function returnContentType(url) {
     if (response.ok) {
       return response.headers.get('Content-Type');
     } else {
-      console.error('Failed to fetch content type:', response.status);
+      console.error('Failed to fetch content type:', response.status, response.statuscode);
       return null;
     }
   } catch (error) {
