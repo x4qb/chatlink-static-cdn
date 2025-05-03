@@ -158,8 +158,9 @@ function escapeHtml(unsafe) {
 }
 
 // Send message function to send over WebSocket
+// Send message function to send over WebSocket
+// Send message function to send over WebSocket
 async function bcMessage(room) {
-  const messagesContainer = document.getElementById('messages');
   const messageInput = document.getElementById('messageInput');
   let content = messageInput.value.trim();
 
@@ -167,6 +168,10 @@ async function bcMessage(room) {
 
   content = escapeHtml(content);
 
+  // Use receiveMessage to display the sent message (even for the sender)
+  await receiveMessage(content, room);
+
+  // Send the message over WebSocket
   if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(content);
     messageInput.value = '';  // Clear the input after sending
