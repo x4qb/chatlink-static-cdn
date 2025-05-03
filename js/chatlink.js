@@ -128,13 +128,17 @@ async function receiveMessage(content, roomName) {
       </audio>
     `;
   } else if (contentType === 'text/html-link') {
-  msg.innerHTML = `
-    <div class="chat-message">${realText}</div>
-    <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">
-      Click here to view the webpage
-    </a>
-  `;
-} else if (contentType.startsWith('video/')) {
+    if (realText.length > 0) {
+      msg.innerHTML = `
+        <div class="chat-message">${realText}</div>
+        <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">View webpage</a>
+      `;
+    } else {
+      msg.innerHTML = `
+        <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">View webpage</a>
+      `;
+    }
+  } else if (contentType.startsWith('video/')) {
     msg.className = 'video-message';
     msg.innerHTML = `
       <div class="chat-message">${realText}</div>
