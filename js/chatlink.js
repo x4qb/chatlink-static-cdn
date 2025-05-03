@@ -1,197 +1,155 @@
-async function returnContentType(url) {
-    try {
-        const response = await fetch(url, { method: 'HEAD' });
-        const contentType = response.headers.get('Content-Type');
-        
-        if (contentType) {
-            return contentType;
-        }
-        
-        return null;
-    } catch (error) {
-        console.error('error check content type', error);
-        return false;
-    }
+let unread = 0;
+let roomNameVar;
+let socket;
+
+function extractFirstUrl(content) {
+  const urlPattern = /https?:\/\/[^\s]+/;
+  const match = content.match(urlPattern);
+  return match ? match[0] : null;
 }
 
-function extractFirstUrl(text) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const matches = text.match(urlRegex);
-    return matches ? matches[0] : null;
+async function connectWebSocket(roomName) {
+  roomNameVar = roomName;
+  const wsUrl = `wss://chatlink.space/messagerouting/websocket/connection?room=${roomName}`;
+
+  socket = new WebSocket(wsUrl);
+
+  socket.onopen = () => {
+    console.log('WebSocket connection established');
+    loadPriorMessages(roomName);
+  };
+
+  socket.onmessage = (event) => {
+    const data = event.data;
+    receiveMessage(data, roomName);
+  };
+
+  socket.onerror = (error) => {
+    console.error('WebSocket error:', error);
+  };
+
+  socket.onclose = () => {
+    console.log('WebSocket connection closed');
+  };
 }
 
-let unread = 0
-let roomNameVar
 async function receiveMessage(content, roomName) {
-    const messagesContainer = document.getElementById('messages');
-    const msg = document.createElement('div');
-    msg.className = 'chat-message';
-    msg.innerHTML = convertUrlsToLinks(content);
-    messagesContainer.appendChild(msg);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  const messagesContainer = document.getElementById('messages');
+  const msg = document.createElement('div');
+  msg.className = 'chat-message';
+  msg.innerHTML = convertUrlsToLinks(content);
+  messagesContainer.appendChild(msg);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    const realText = content.replace(/https?:\/\/[^\s]+/g, '').trim();
-    const firstUrl = extractFirstUrl(content);
-    if (!firstUrl) return;
-    roomNameVar = roomName
+  const realText = content.replace(/https?:\/\/[^\s]+/g, '').trim();
+  const firstUrl = extractFirstUrl(content);
+  if (!firstUrl) return;
 
-    if (document.visibilityState !== 'visible') {
-        const notifAudio = new Audio('/cdn/media/receivednotif.mp3')
-        notifAudio.play();
+  if (document.visibilityState !== 'visible') {
+    const notifAudio = new Audio('/cdn/media/receivednotif.mp3');
+    notifAudio.play();
+    unread += 1;
+    document.title = `(${unread}) Chatlink - ${roomName}`;
+  }
 
-        unread += 1;
-        document.title = `(${unread}) Chatlink - ${roomName}`;
-    }
-
-    const contentType = await returnContentType(firstUrl);
-    if (firstUrl && typeof contentType === 'string' && contentType.startsWith('image/')) {
-        msg.className = 'image-message';
-        msg.innerHTML = `
-            <div class="chat-message">${realText}</div>
-            <img 
-                src="${firstUrl}" 
-                alt="User sent image" 
-                class="image-message" 
-                onerror="this.onerror=null; this.src='/cdn/images/error.png';"
-            >
-        `;
-    } else if (firstUrl && typeof contentType === 'string' && contentType.startsWith('audio/')) {
-        msg.className = 'audio-message';
-        msg.innerHTML = `
-            <div class="chat-message">${realText}</div>
-            <audio controls>
-                <source src="${firstUrl}" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
-        `;
-    } else if (firstUrl && typeof contentType === 'string' && contentType.startsWith('video/')) {
-        msg.className = 'video-message';
-        msg.innerHTML = `
-            <div class="chat-message">${realText}</div>
-            <video controls width="300">
-                <source src="${firstUrl}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        `;
-    } else if (firstUrl && typeof contentType === 'string' && contentType === 'text/html') {
-        msg.innerHTML = `
-            <div class="chat-message">${realText}</div>
-        `;
-    } else if (firstUrl && await returnContentType(firstUrl) === 'application/pdf') {
+  const contentType = await returnContentType(firstUrl);
+  if (firstUrl && typeof contentType === 'string' && contentType.startsWith('image/')) {
+    msg.className = 'image-message';
+    msg.innerHTML = `
+      <div class="chat-message">${realText}</div>
+      <img 
+        src="${firstUrl}" 
+        alt="User sent image" 
+        class="image-message" 
+        onerror="this.onerror=null; this.src='/cdn/images/error.png';"
+      >
+    `;
+  } else if (firstUrl && typeof contentType === 'string' && contentType.startsWith('audio/')) {
+    msg.className = 'audio-message';
+    msg.innerHTML = `
+      <div class="chat-message">${realText}</div>
+      <audio controls>
+        <source src="${firstUrl}" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    `;
+  } else if (firstUrl && typeof contentType === 'string' && contentType.startsWith('video/')) {
+    msg.className = 'video-message';
+    msg.innerHTML = `
+      <div class="chat-message">${realText}</div>
+      <video controls width="300">
+        <source src="${firstUrl}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    `;
+  } else if (firstUrl && typeof contentType === 'string' && contentType === 'text/html') {
+    msg.innerHTML = `
+      <div class="chat-message">${realText}</div>
+    `;
+  } else if (firstUrl && await returnContentType(firstUrl) === 'application/pdf') {
     msg.className = 'pdf-message';
     msg.innerHTML = `
-        <div class="chat-message">${realText}</div>
-        <iframe src="${firstUrl}" width="100%" height="500px" style="border: none;"></iframe>
+      <div class="chat-message">${realText}</div>
+      <iframe src="${firstUrl}" width="100%" height="500px" style="border: none;"></iframe>
     `;
-}
+  }
 }
 
 document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'visible') {
-        unread = 0
-        document.title = `Chatlink - ${roomNameVar}`;
-    }
-});
+  if (document.visibilityState === 'visible' && socket === null) {
+    connectWebSocket(roomNameVar);
+  }
+})
 
 async function loadPriorMessages(roomName) {
-    try {
-        const response = await fetch(`https://chatlink.space/messages/room/${roomName}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+  try {
+    const response = await fetch(`https://chatlink.space/messages/room/${roomName}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch prior messages');
-        }
-
-        const responseData = await response.json();
-
-        if (responseData.length === 0) {
-            receiveMessage("It seems like there are no previous messages in this chatroom. Start the conversation!", roomName);
-        }
-
-        for (const msg of responseData) {
-            await receiveMessage(msg.content, roomName);
-        }
-    } catch (error) {
-        console.error('Error loading messages:', error);
+    if (!response.ok) {
+      throw new Error('Failed to fetch prior messages');
     }
+
+    const responseData = await response.json();
+
+    if (responseData.length === 0) {
+      receiveMessage("It seems like there are no previous messages in this chatroom. Start the conversation!", roomName);
+    }
+
+    for (const msg of responseData) {
+      await receiveMessage(msg.content, roomName);
+    }
+  } catch (error) {
+    console.error('Error loading messages:', error);
+  }
 }
 
 function convertUrlsToLinks(text) {
-    const urlPattern = /(\b(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*)|(\b(?:www\.)[^\s/$.?#].[^\s]*)|(\b[^\s]+\.[a-z]{2,}\b)/gi;
-    return text.replace(urlPattern, (url) => {
-        if (url.startsWith('www')) {
-            url = 'https://' + url;
-        }
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-    });
+  const urlPattern = /(\b(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*)|(\b(?:www\.)[^\s/$.?#].[^\s]*)|(\b[^\s]+\.[a-z]{2,}\b)/gi;
+  return text.replace(urlPattern, (url) => {
+    if (url.startsWith('www')) {
+      url = 'https://' + url;
+    }
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+  });
 }
 
-async function bcMessage(supabaseVar, room) {
-    const messagesContainer = document.getElementById('messages');
-    const messageInput = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
-    let content = messageInput.value.trim();
+async function bcMessage(room) {
+  const messageInput = document.getElementById('messageInput');
+  const content = messageInput.value.trim();
 
-    if (!content) return;
-    function escapeHtml(unsafe) {
-      return unsafe.replace(/[&<>"']/g, function (match) {
-        const escapeChars = {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#039;',
-        };
-        return escapeChars[match];
-      });
-    }
+  if (!content) return;
 
-    content = escapeHtml(content);
-    const { error } = await supabaseVar.from('messages').insert([{ content, room }]);
-
-    const requestBody = { content, room };
-
-    try {
-        const response = await fetch('https://chatlink.space/messages/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-        });
-
-        if (!response.ok) {
-            const errorMessage = await response.text();
-            alert(`Error: ${errorMessage}`);
-            return;
-        }
-
-        const responseData = await response.json();
-        messageInput.value = '';
-    } catch (error) {
-        console.error('Error sending message:', error);
-    }
-
-    if (error) {
-        console.error('Error broadcasting message via Supabase:', error);
-    }
-}
-
-async function startRealtime(supabaseVar, roomName) {
-    try {
-        await supabaseVar.channel('public:messages').on('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-        }, (payload) => {
-            receiveMessage(payload.new.content || JSON.stringify(payload.new), roomName);
-        }).subscribe();
-        console.log("connected");
-    } catch (error) {
-        console.error("Connection failed", error);
-    }
+  await receiveMessage(content, room);
+    
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(content);
+    messageInput.value = '';
+  } else {
+    console.error('WebSocket is not open');
+  }
 }
