@@ -131,11 +131,11 @@ async function receiveMessage(content, roomName) {
     if (realText.length > 0) {
       msg.innerHTML = `
         <div class="chat-message">${realText}</div>
-        <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">View webpage</a>
+        <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>
       `;
     } else {
       msg.innerHTML = `
-        <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">View webpage</a>
+        <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>
       `;
     }
   } else if (contentType.startsWith('video/')) {
