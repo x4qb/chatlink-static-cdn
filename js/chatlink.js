@@ -26,17 +26,14 @@ async function fetchResource(url) {
 
     if (response.ok) {
       const contentType = response.headers.get('Content-Type');
-
-      // 🔥 If it's a plain text response, maybe it's a returned URL
+      
       if (contentType === 'text/plain') {
         const text = await response.text();
         if (text.startsWith('http')) {
-          // The backend sent us a link instead of the file
           return { contentType: 'text/html-link', objectUrl: text };
         }
       }
-
-      // Normal binary content
+      
       const blob = await response.blob();
       const objectUrl = URL.createObjectURL(blob);
       return { contentType, objectUrl };
@@ -108,63 +105,75 @@ async function receiveMessage(content, roomName) {
   const { contentType, objectUrl } = resource;
 
   if (contentType.startsWith('image/')) {
-    msg.className = 'image-message';
-    msg.innerHTML = `
-      <div class="chat-message">${realText}</div>
-      <img 
-        src="${objectUrl}" 
-        alt="User sent image" 
-        class="image-message"
-        onerror="this.onerror=null; this.src='/cdn/images/error.png';"
-      >
-    `;
-  } else if (contentType.startsWith('audio/')) {
-    msg.className = 'audio-message';
-    msg.innerHTML = `
-      <div class="chat-message">${realText}</div>
-      <audio controls>
-        <source src="${objectUrl}" type="${contentType}">
-        Your browser does not support the audio element.
-      </audio>
-    `;
-  } else if (contentType === 'text/html-link') {
-    if (realText.length > 0) {
-      msg.innerHTML = `
-        <div class="chat-message">${realText}</div>
-        <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>
-      `;
-    } else {
-      msg.innerHTML = `
-        <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>
-      `;
-    }
-  } else if (contentType.startsWith('video/')) {
-    msg.className = 'video-message';
-    msg.innerHTML = `
-      <div class="chat-message">${realText}</div>
-      <video controls width="300">
-        <source src="${objectUrl}" type="${contentType}">
-        Your browser does not support the video tag.
-      </video>
-    `;
-  } else if (contentType === 'application/pdf') {
-    msg.className = 'pdf-message';
-    msg.innerHTML = `
-      <div class="chat-message">${realText}</div>
-      <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>
-    `;
-  } else if (contentType === 'text/html') {
-    msg.innerHTML = `
-      <div class="chat-message">${realText}</div>
-    `;
-  } else {
-    msg.innerHTML = `
-      <div class="chat-message">${realText}</div>
-    `;
-  }
-
-  // Optional cleanup: revoke object URL later if removing the message
-  // setTimeout(() => URL.revokeObjectURL(objectUrl), 60000); // for example after 1 min
+  msg.className = 'image-message';
+  msg.innerHTML = realText.length > 0 ? `
+    <div class="chat-message">${realText}</div>
+    <img 
+      src="${objectUrl}" 
+      alt="User sent image" 
+      class="image-message"
+      onerror="this.onerror=null; this.src='/cdn/images/error.png';"
+    >
+  ` : `
+    <img 
+      src="${objectUrl}" 
+      alt="User sent image" 
+      class="image-message"
+      onerror="this.onerror=null; this.src='/cdn/images/error.png';"
+    >
+  `;
+} else if (contentType.startsWith('audio/')) {
+  msg.className = 'audio-message';
+  msg.innerHTML = realText.length > 0 ? `
+    <div class="chat-message">${realText}</div>
+    <audio controls>
+      <source src="${objectUrl}" type="${contentType}">
+      Your browser does not support the audio element.
+    </audio>
+  ` : `
+    <audio controls>
+      <source src="${objectUrl}" type="${contentType}">
+      Your browser does not support the audio element.
+    </audio>
+  `;
+} else if (contentType === 'text/html-link') {
+  msg.innerHTML = realText.length > 0 ? `
+    <div class="chat-message">${realText}</div>
+    <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>
+  ` : `
+    <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>
+  `;
+} else if (contentType.startsWith('video/')) {
+  msg.className = 'video-message';
+  msg.innerHTML = realText.length > 0 ? `
+    <div class="chat-message">${realText}</div>
+    <video controls width="300">
+      <source src="${objectUrl}" type="${contentType}">
+      Your browser does not support the video tag.
+    </video>
+  ` : `
+    <video controls width="300">
+      <source src="${objectUrl}" type="${contentType}">
+      Your browser does not support the video tag.
+    </video>
+  `;
+} else if (contentType === 'application/pdf') {
+  msg.className = 'pdf-message';
+  msg.innerHTML = realText.length > 0 ? `
+    <div class="chat-message">${realText}</div>
+    <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>
+  ` : `
+    <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>
+  `;
+} else if (contentType === 'text/html') {
+  msg.innerHTML = realText.length > 0 ? `
+    <div class="chat-message">${realText}</div>
+  ` : '';
+} else {
+  msg.innerHTML = realText.length > 0 ? `
+    <div class="chat-message">${realText}</div>
+  ` : '';
+}
 }
 
 
