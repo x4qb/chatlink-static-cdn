@@ -12,7 +12,6 @@ async function connectWebSocket(roomName) {
 
     socket.onopen = () => {
         console.log('WebSocket connection established');
-        // Optionally, load prior messages here if needed.
         loadPriorMessages(roomName);
     };
 
@@ -28,6 +27,13 @@ async function connectWebSocket(roomName) {
     socket.onclose = () => {
         console.log('WebSocket connection closed');
     };
+}
+
+// Function to extract the first URL from the content
+function extractFirstUrl(content) {
+    const urlPattern = /https?:\/\/[^\s]+/;
+    const match = content.match(urlPattern);
+    return match ? match[0] : null;
 }
 
 // Function to receive incoming messages and display them
