@@ -186,3 +186,28 @@ async function bcMessage(room) {
     console.error('WebSocket is not open');
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+      const pathParts = window.location.pathname.split('/');
+      const roomName = pathParts[pathParts.length - 1];
+
+      connectWebSocket(roomName);
+
+      document.getElementById('sendButton').addEventListener('click', () => {
+        const messageInput = document.getElementById('messageInput');
+        const content = messageInput.value.trim();
+        if (!content) return;
+        bcMessage(roomName);
+      });
+
+      document.getElementById('messageInput').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          const messageInput = document.getElementById('messageInput');
+          const content = messageInput.value.trim();
+          if (content) {
+            event.preventDefault();
+            bcMessage(roomName);
+          }
+        }
+      });
+    });
