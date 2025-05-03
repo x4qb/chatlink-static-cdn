@@ -4,6 +4,13 @@ let roomNameVar;
 // WebSocket setup for the new system
 let socket;
 
+// Function to extract the first URL from the content
+function extractFirstUrl(content) {
+    const urlPattern = /https?:\/\/[^\s]+/;
+    const match = content.match(urlPattern);
+    return match ? match[0] : null;
+}
+
 async function connectWebSocket(roomName) {
     roomNameVar = roomName;
     const wsUrl = `wss://chatlink.space/messagerouting/websocket/connection?room=${roomName}`;
@@ -27,13 +34,6 @@ async function connectWebSocket(roomName) {
     socket.onclose = () => {
         console.log('WebSocket connection closed');
     };
-}
-
-// Function to extract the first URL from the content
-function extractFirstUrl(content) {
-    const urlPattern = /https?:\/\/[^\s]+/;
-    const match = content.match(urlPattern);
-    return match ? match[0] : null;
 }
 
 // Function to receive incoming messages and display them
