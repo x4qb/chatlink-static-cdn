@@ -2,6 +2,25 @@ let unread = 0;
 let roomNameVar;
 let socket;
 
+async function returnContentType(url) {
+  try {
+    const response = await fetch(url, {
+      method: 'HEAD',
+    });
+
+    if (response.ok) {
+      return response.headers.get('Content-Type');
+    } else {
+      console.error('Failed to fetch content type:', response.status);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching content type:', error);
+    return null;
+  }
+}
+
+
 function extractFirstUrl(content) {
   const urlPattern = /https?:\/\/[^\s]+/;
   const match = content.match(urlPattern);
