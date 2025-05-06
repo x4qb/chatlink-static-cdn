@@ -189,7 +189,7 @@ function convertUrlsToLinks(text) {
     if (url.startsWith('www')) {
       url = 'https://' + url;
     }
-    return <a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>;
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>;`
   });
 }
 
