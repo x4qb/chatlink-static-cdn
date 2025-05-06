@@ -11,7 +11,7 @@ async function returnContentType(url) {
     if (response.ok) {
       return response.headers.get('Content-Type');
     } else {
-      console.error('Failed to fetch content type:', response.status, response.statuscode);
+      console.error('Failed to fetch content type:', response.status, response.statusCode);
       return null;
     }
   } catch (error) {
@@ -47,8 +47,6 @@ async function fetchResource(url) {
   }
 }
 
-
-
 function extractFirstUrl(content) {
   const urlPattern = /https?:\/\/[^\s]+/;
   const match = content.match(urlPattern);
@@ -57,12 +55,12 @@ function extractFirstUrl(content) {
 
 async function connectWebSocket(roomName) {
   roomNameVar = roomName;
-  const wsUrl = `wss://chatlink.space/messagerouting/websocket/connection?room=${roomName};`
+  const wsUrl = `wss://chatlink.space/messagerouting/websocket/connection?room=${roomName}`;
 
   socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
-    console.log('%câš ï¸ WARNING! âš ï¸\nDo NOT paste code you don\'t understand or trust here.\nIt may give attackers access to your account or data.', 'color: red; font-size: 16px; font-weight: bold;');
+    console.log('%c⚠ WARNING! ⚠\nDo NOT paste code you don\'t understand or trust here.\nIt may give attackers access to your account or data.', 'color: red; font-size: 16px; font-weight: bold;');
     console.log('Chatlink connectivity finished');
     loadPriorMessages(roomName);
   };
@@ -89,7 +87,7 @@ async function receiveMessage(content, roomName) {
   messagesContainer.appendChild(msg);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-  const realText = content.replace(`/https?:\/\/[^\s]+/g, ''`).trim();
+  const realText = content.replace(/https?:\/\/[^\s]+/g, '').trim();
   const firstUrl = extractFirstUrl(content);
   if (!firstUrl) return;
 
@@ -105,56 +103,61 @@ async function receiveMessage(content, roomName) {
 
   const { contentType, objectUrl } = resource;
 
-  let mediaHtml = '';
-
   if (contentType.startsWith('image/')) {
-    mediaHtml = `
-      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
-        <img src="${objectUrl}" alt="User sent image" class="image-message"
-             onerror="this.onerror=null; this.src='/cdn/images/error.png';">
-      </a>`;
     msg.className = 'image-message';
+    msg.innerHTML = realText.length > 0 ? 
+      `<div class="chat-message">${realText}</div>
+      <img src="${objectUrl}" alt="User sent image" class="image-message" onerror="this.onerror=null; this.src='/cdn/images/error.png';">` : 
+      `<img src="${objectUrl}" alt="User sent image" class="image-message" onerror="this.onerror=null; this.src='/cdn/images/error.png';">`;
   } else if (contentType.startsWith('audio/')) {
-    mediaHtml = `
-      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
-        <audio controls>
-          <source src="${objectUrl}" type="${contentType}">
-          Your browser does not support the audio element.
-        </audio>
-      </a>`;
     msg.className = 'audio-message';
-  } else if (contentType.startsWith('video/')) {
-    mediaHtml = `
-      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
-        <video controls width="300">
-          <source src="${objectUrl}" type="${contentType}">
-          Your browser does not support the video tag.
-        </video>
-      </a>`;
-    msg.className = 'video-message';
-  } else if (contentType === 'application/pdf') {
-    mediaHtml = `
-      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
-        <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>
-      </a>`;
-    msg.className = 'pdf-message';
+    msg.innerHTML = realText.length > 0 ? 
+      `<div class="chat-message">${realText}</div>
+      <audio controls>
+        <source src="${objectUrl}" type="${contentType}">
+        Your browser does not support the audio element.
+      </audio>` : 
+      `<audio controls>
+        <source src="${objectUrl}" type="${contentType}">
+        Your browser does not support the audio element.
+      </audio>`;
   } else if (contentType === 'text/html-link') {
-    mediaHtml = `
-      <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>`;
+    msg.innerHTML = realText.length > 0 ? 
+      `<div class="chat-message">${realText}</div>
+      <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>` : 
+      `<a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>`;
+  } else if (contentType.startsWith('video/')) {
+    msg.className = 'video-message';
+    msg.innerHTML = realText.length > 0 ? 
+      `<div class="chat-message">${realText}</div>
+      <video controls width="300">
+        <source src="${objectUrl}" type="${contentType}">
+        Your browser does not support the video tag.
+      </video>` : 
+      `<video controls width="300">
+        <source src="${objectUrl}" type="${contentType}">
+        Your browser does not support the video tag.
+      </video>`;
+  } else if (contentType === 'application/pdf') {
+    msg.className = 'pdf-message';
+    msg.innerHTML = realText.length > 0 ? 
+      `<div class="chat-message">${realText}</div>
+      <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>` : 
+      `<iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>`;
+  } else if (contentType === 'text/html') {
+    msg.innerHTML = realText.length > 0 ? 
+      `<div class="chat-message">${realText}</div>` : '';
+  } else {
+    msg.innerHTML = realText.length > 0 ? 
+      `<div class="chat-message">${realText}</div>` : '';
   }
-
-  msg.innerHTML = realText.length > 0 
-    ? `<div class="chat-message">${realText}</div>${mediaHtml}`
-    : mediaHtml;
 }
-
-
 
 document.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'visible' && socket === null) {
     connectWebSocket(roomNameVar);
   }
-})
+});
 
 async function loadPriorMessages(roomName) {
   try {
@@ -189,7 +192,7 @@ function convertUrlsToLinks(text) {
     if (url.startsWith('www')) {
       url = 'https://' + url;
     }
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>;`
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
   });
 }
 
@@ -214,35 +217,34 @@ async function bcMessage(room) {
   
   if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(content);
-    receiveMessage(content, room)
+    receiveMessage(content, room);
     messageInput.value = '';
   } else {
     console.error('WebSocket is not open');
   }
 }
 
-
 document.addEventListener('DOMContentLoaded', () => {
-      const pathParts = window.location.pathname.split('/');
-      const roomName = pathParts[pathParts.length - 1];
+  const pathParts = window.location.pathname.split('/');
+  const roomName = pathParts[pathParts.length - 1];
 
-      connectWebSocket(roomName);
+  connectWebSocket(roomName);
 
-      document.getElementById('sendButton').addEventListener('click', () => {
-        const messageInput = document.getElementById('messageInput');
-        const content = messageInput.value.trim();
-        if (!content) return;
+  document.getElementById('sendButton').addEventListener('click', () => {
+    const messageInput = document.getElementById('messageInput');
+    const content = messageInput.value.trim();
+    if (!content) return;
+    bcMessage(roomName);
+  });
+
+  document.getElementById('messageInput').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      const messageInput = document.getElementById('messageInput');
+      const content = messageInput.value.trim();
+      if (content) {
+        event.preventDefault();
         bcMessage(roomName);
-      });
-
-      document.getElementById('messageInput').addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-          const messageInput = document.getElementById('messageInput');
-          const content = messageInput.value.trim();
-          if (content) {
-            event.preventDefault();
-            bcMessage(roomName);
-          }
-        }
-      });
-    });
+      }
+    }
+  });
+});
