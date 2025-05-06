@@ -94,44 +94,45 @@ async function receiveMessage(content, roomName) {
   if (!resource) return;
 
   const { contentType, objectUrl } = resource;
+
   let mediaHtml = '';
 
   if (contentType.startsWith('image/')) {
     mediaHtml = `
-      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
-        <img src="${objectUrl}" data-real-url="${firstUrl}" alt="User sent image" class="image-message"
-          onerror="this.onerror=null; this.src='/cdn/images/error.png';">
-      </a>`;
+      <img 
+        src="${objectUrl}" 
+        data-real-url="${firstUrl}" 
+        alt="User sent image" 
+        class="image-message"
+        onerror="this.onerror=null; this.src='/cdn/images/error.png';"
+        style="cursor: pointer;"
+      >`;
   } else if (contentType.startsWith('audio/')) {
     mediaHtml = `
-      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
-        <audio controls data-real-url="${firstUrl}">
-          <source src="${objectUrl}" type="${contentType}" data-real-url="${firstUrl}">
-          Your browser does not support the audio element.
-        </audio>
-      </a>`;
-  } else if (contentType === 'text/html-link') {
-    mediaHtml = `
-      <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>`;
+      <audio controls data-real-url="${firstUrl}">
+        <source src="${objectUrl}" type="${contentType}" data-real-url="${firstUrl}">
+        Your browser does not support the audio element.
+      </audio>`;
   } else if (contentType.startsWith('video/')) {
     mediaHtml = `
-      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
-        <video controls width="300" data-real-url="${firstUrl}">
-          <source src="${objectUrl}" type="${contentType}" data-real-url="${firstUrl}">
-          Your browser does not support the video tag.
-        </video>
-      </a>`;
+      <video controls width="300" data-real-url="${firstUrl}">
+        <source src="${objectUrl}" type="${contentType}" data-real-url="${firstUrl}">
+        Your browser does not support the video tag.
+      </video>`;
   } else if (contentType === 'application/pdf') {
     mediaHtml = `
-      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
-        <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;" data-real-url="${firstUrl}"></iframe>
-      </a>`;
+      <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;" data-real-url="${firstUrl}"></iframe>`;
+  } else if (contentType === 'text/html-link') {
+    // For plain links, just insert as a clickable link (if wanted)
+    mediaHtml = `<span data-real-url="${firstUrl}">${firstUrl}</span>`;
   }
 
-  msg.innerHTML = realText.length > 0
-    ? `<div class="chat-message">${realText}</div>${mediaHtml}`
-    : mediaHtml;
+  msg.innerHTML = realText.length > 0 ? `
+    <div class="chat-message">${realText}</div>
+    ${mediaHtml}
+  ` : mediaHtml;
 }
+
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && socket === null) {
