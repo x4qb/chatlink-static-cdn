@@ -89,7 +89,7 @@ async function receiveMessage(content, roomName) {
   messagesContainer.appendChild(msg);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-  const realText = content.replace(/https?:\/\/[^\s]+/g, '').trim();
+  const realText = content.replace(`/https?:\/\/[^\s]+/g, ''`).trim();
   const firstUrl = extractFirstUrl(content);
   if (!firstUrl) return;
 
