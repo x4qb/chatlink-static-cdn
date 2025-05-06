@@ -57,7 +57,7 @@ function extractFirstUrl(content) {
 
 async function connectWebSocket(roomName) {
   roomNameVar = roomName;
-  const wsUrl = wss://chatlink.space/messagerouting/websocket/connection?room=${roomName};
+  const wsUrl = `wss://chatlink.space/messagerouting/websocket/connection?room=${roomName};`
 
   socket = new WebSocket(wsUrl);
 
@@ -97,7 +97,7 @@ async function receiveMessage(content, roomName) {
     const notifAudio = new Audio('/cdn/media/receivednotif.mp3');
     notifAudio.play();
     unread += 1;
-    document.title = (${unread}) Chatlink - ${roomName};
+    document.title = `(${unread}) Chatlink - ${roomName}`;
   }
 
   const resource = await fetchResource(firstUrl);
@@ -105,77 +105,49 @@ async function receiveMessage(content, roomName) {
 
   const { contentType, objectUrl } = resource;
 
+  let mediaHtml = '';
+
   if (contentType.startsWith('image/')) {
-  msg.className = 'image-message';
-  msg.innerHTML = realText.length > 0 ? 
-    <div class="chat-message">${realText}</div>
-    <img 
-      src="${objectUrl}" 
-      alt="User sent image" 
-      class="image-message"
-      onerror="this.onerror=null; this.src='/cdn/images/error.png';"
-    >
-   : 
-    <img 
-      src="${objectUrl}" 
-      alt="User sent image" 
-      class="image-message"
-      onerror="this.onerror=null; this.src='/cdn/images/error.png';"
-    >
-  ;
-} else if (contentType.startsWith('audio/')) {
-  msg.className = 'audio-message';
-  msg.innerHTML = realText.length > 0 ? 
-    <div class="chat-message">${realText}</div>
-    <audio controls>
-      <source src="${objectUrl}" type="${contentType}">
-      Your browser does not support the audio element.
-    </audio>
-   : 
-    <audio controls>
-      <source src="${objectUrl}" type="${contentType}">
-      Your browser does not support the audio element.
-    </audio>
-  ;
-} else if (contentType === 'text/html-link') {
-  msg.innerHTML = realText.length > 0 ? 
-    <div class="chat-message">${realText}</div>
-    <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>
-   : 
-    <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>
-  ;
-} else if (contentType.startsWith('video/')) {
-  msg.className = 'video-message';
-  msg.innerHTML = realText.length > 0 ? 
-    <div class="chat-message">${realText}</div>
-    <video controls width="300">
-      <source src="${objectUrl}" type="${contentType}">
-      Your browser does not support the video tag.
-    </video>
-   : 
-    <video controls width="300">
-      <source src="${objectUrl}" type="${contentType}">
-      Your browser does not support the video tag.
-    </video>
-  ;
-} else if (contentType === 'application/pdf') {
-  msg.className = 'pdf-message';
-  msg.innerHTML = realText.length > 0 ? 
-    <div class="chat-message">${realText}</div>
-    <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>
-   : 
-    <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>
-  ;
-} else if (contentType === 'text/html') {
-  msg.innerHTML = realText.length > 0 ? 
-    <div class="chat-message">${realText}</div>
-   : '';
-} else {
-  msg.innerHTML = realText.length > 0 ? 
-    <div class="chat-message">${realText}</div>
-   : '';
+    mediaHtml = `
+      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
+        <img src="${objectUrl}" alt="User sent image" class="image-message"
+             onerror="this.onerror=null; this.src='/cdn/images/error.png';">
+      </a>`;
+    msg.className = 'image-message';
+  } else if (contentType.startsWith('audio/')) {
+    mediaHtml = `
+      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
+        <audio controls>
+          <source src="${objectUrl}" type="${contentType}">
+          Your browser does not support the audio element.
+        </audio>
+      </a>`;
+    msg.className = 'audio-message';
+  } else if (contentType.startsWith('video/')) {
+    mediaHtml = `
+      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
+        <video controls width="300">
+          <source src="${objectUrl}" type="${contentType}">
+          Your browser does not support the video tag.
+        </video>
+      </a>`;
+    msg.className = 'video-message';
+  } else if (contentType === 'application/pdf') {
+    mediaHtml = `
+      <a href="${firstUrl}" target="_blank" rel="noopener noreferrer">
+        <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>
+      </a>`;
+    msg.className = 'pdf-message';
+  } else if (contentType === 'text/html-link') {
+    mediaHtml = `
+      <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>`;
+  }
+
+  msg.innerHTML = realText.length > 0 
+    ? `<div class="chat-message">${realText}</div>${mediaHtml}`
+    : mediaHtml;
 }
-}
+
 
 
 document.addEventListener('visibilitychange', function() {
@@ -186,7 +158,7 @@ document.addEventListener('visibilitychange', function() {
 
 async function loadPriorMessages(roomName) {
   try {
-    const response = await fetch(https://chatlink.space/messages/room/${roomName}, {
+    const response = await fetch(`https://chatlink.space/messages/room/${roomName}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
