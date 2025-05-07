@@ -190,28 +190,23 @@ function convertUrlsToLinks(text) {
   const urlPattern = /(\b(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*)|(\b(?:www\.)[^\s/$.?#].[^\s]*)|(\b[^\s]+\.[a-z]{2,}\b)/gi;
 
   return text.replace(urlPattern, (url) => {
-    // If the URL starts with 'www', prepend 'https://'
     if (url.startsWith('www')) {
       url = 'https://' + url;
     }
-    // If the URL doesn't start with 'http', 'https', or 'www', prepend 'https://'
     else if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = 'https://' + url;
     }
 
-    // Check if the URL is a chatlink.space/rooms/* URL
     if (url.startsWith('https://chatlink.space/rooms/')) {
       const roomName = url.split('/rooms/')[1].split('/')[0];  // Extract room name from URL
       const displayText = `Chatlink Room - ${roomName}`;
       return `<a href="${url}" target="_blank" rel="noopener noreferrer">${displayText}</a>`;
     }
 
-    // For URLs with paths, ensure the full path is included in the link
     if (url.match(/https?:\/\/[^\s/$.?#].[^\s]*\/[^\s]*/)) {
       return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url.replace(/^https?:\/\//, '')}</a>`;
     }
 
-    // Default case for URLs: display the URL text without scheme
     return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url.replace(/^https?:\/\//, '')}</a>`;
   });
 }
