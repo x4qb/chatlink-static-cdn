@@ -188,10 +188,15 @@ async function loadPriorMessages(roomName) {
 
 function convertUrlsToLinks(text) {
   const urlPattern = /(\b(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*)|(\b(?:www\.)[^\s/$.?#].[^\s]*)|(\b[^\s]+\.[a-z]{2,}\b)/gi;
+
   return text.replace(urlPattern, (url) => {
     if (url.startsWith('www')) {
       url = 'https://' + url;
     }
+    else if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
     return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
   });
 }
