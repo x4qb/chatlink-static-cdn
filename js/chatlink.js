@@ -81,10 +81,21 @@ async function connectWebSocket(roomName) {
 
 async function receiveMessage(content, roomName) {
   const messagesContainer = document.getElementById('messages');
+  const msgWrapper = document.createElement('div');
+  msgWrapper.className = 'chat-message-wrapper';
+
+  // Add the avatar image to the left
+  const avatar = document.createElement('img');
+  avatar.src = 'https://via.placeholder.com/40'; // Replace with the user's actual avatar URL
+  avatar.className = 'avatar';
+  avatar.alt = 'User avatar';
+  msgWrapper.appendChild(avatar);
+
   const msg = document.createElement('div');
   msg.className = 'chat-message';
   msg.innerHTML = convertUrlsToLinks(content);
-  messagesContainer.appendChild(msg);
+  msgWrapper.appendChild(msg);
+  messagesContainer.appendChild(msgWrapper);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
   const realText = content.replace(/https?:\/\/[^\s]+/g, '').trim();
@@ -145,18 +156,18 @@ async function receiveMessage(content, roomName) {
       <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>` : 
       `<iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>`;
   } else if (contentType === 'text/html') {
-  const isAllowed = confirm('This is an external or untrusted page. Do you want to continue?');
+    const isAllowed = confirm('This is an external or untrusted page. Do you want to continue?');
   
-  if (isAllowed) {
+    if (isAllowed) {
+      msg.innerHTML = realText.length > 0 ? 
+        `<div class="chat-message">${realText}</div>` : '';
+    } else {
+      msg.innerHTML = `<div class="chat-message">Link blocked</div>`;
+    }
+  } else {
     msg.innerHTML = realText.length > 0 ? 
       `<div class="chat-message">${realText}</div>` : '';
-  } else {
-    msg.innerHTML = `<div class="chat-message">Link blocked</div>`;
   }
-} else {
-  msg.innerHTML = realText.length > 0 ? 
-    `<div class="chat-message">${realText}</div>` : '';
-}
 }
 
 document.addEventListener('visibilitychange', function() {
