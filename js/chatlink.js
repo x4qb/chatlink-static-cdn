@@ -145,12 +145,21 @@ async function receiveMessage(content, roomName) {
       <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>` : 
       `<iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>`;
   } else if (contentType === 'text/html') {
+  // Always prompt the user before allowing navigation
+  const isAllowed = confirm('This is an external or untrusted page. Do you want to continue?');
+  
+  if (isAllowed) {
+    // If the user clicks "Yes", display the link content
     msg.innerHTML = realText.length > 0 ? 
       `<div class="chat-message">${realText}</div>` : '';
   } else {
-    msg.innerHTML = realText.length > 0 ? 
-      `<div class="chat-message">${realText}</div>` : '';
+    // If the user clicks "No", you can show a warning or do nothing
+    msg.innerHTML = `<div class="chat-message">Link blocked</div>`;
   }
+} else {
+  msg.innerHTML = realText.length > 0 ? 
+    `<div class="chat-message">${realText}</div>` : '';
+}
 }
 
 document.addEventListener('visibilitychange', function() {
