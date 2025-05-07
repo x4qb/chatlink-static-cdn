@@ -196,10 +196,8 @@ function convertUrlsToLinks(text) {
       url = 'https://' + url;
     }
 
-    if (url.startsWith('https://chatlink.space/rooms/')) {
-      const roomName = url.split('/rooms/')[1].split('/')[0];
-      const displayText = `Chatlink Room - ${roomName}`;
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${displayText}</a>`;
+    if (url.startsWith('https://chatlink.space')) {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">Chatlink</a>`;
     }
 
     if (url.match(/https?:\/\/[^\s/$.?#].[^\s]*\/[^\s]*/)) {
