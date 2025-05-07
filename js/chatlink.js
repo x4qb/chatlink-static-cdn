@@ -89,7 +89,7 @@ async function receiveMessage(content, roomName, sender) {
   
   const username = document.createElement('div');
   username.className = 'username';
-  username.textContent = 'Chatlinker";
+  username.textContent = 'Chatlinker';
   
   const messageContent = document.createElement('div');
   messageContent.className = 'message-content';
