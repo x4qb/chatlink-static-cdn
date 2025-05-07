@@ -92,13 +92,6 @@ async function receiveMessage(content, roomName) {
   const firstUrl = extractFirstUrl(content);
   if (!firstUrl) return;
 
-  if (document.visibilityState !== 'visible') {
-    const notifAudio = new Audio('https://cdn.chatlink.space/audios/receivednotif.mp3');
-    notifAudio.play();
-    unread += 1;
-    document.title = (${unread}) Chatlink - ${roomName};
-  }
-
   const resource = await fetchResource(firstUrl);
   if (!resource) return;
 
