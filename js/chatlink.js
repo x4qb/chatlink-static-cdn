@@ -79,20 +79,13 @@ async function connectWebSocket(roomName) {
   };
 }
 
-async function receiveMessage(content, roomName, sender) {
-  const messagesContainer = document.getElementById('messages');
-  const msgWrapper = document.createElement('div');
-  msgWrapper.className = 'chat-message-wrapper';
 
+async function receiveMessage(content, roomName) {
+  const messagesContainer = document.getElementById('messages');
   const msg = document.createElement('div');
   msg.className = 'chat-message';
-  
-  const messageContent = document.createElement('div');
-  messageContent.className = 'chat-message';
-  messageContent.innerHTML = convertUrlsToLinks(content);
-  msgWrapper.appendChild(messageContent);
-  
-  messagesContainer.appendChild(msgWrapper);
+  msg.innerHTML = convertUrlsToLinks(content);
+  messagesContainer.appendChild(msg);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
   const realText = content.replace(/https?:\/\/[^\s]+/g, '').trim();
@@ -103,7 +96,7 @@ async function receiveMessage(content, roomName, sender) {
     const notifAudio = new Audio('https://cdn.chatlink.space/audios/receivednotif.mp3');
     notifAudio.play();
     unread += 1;
-    document.title = `(${unread}) Chatlink - ${roomName}`;
+    document.title = (${unread}) Chatlink - ${roomName};
   }
 
   const resource = await fetchResource(firstUrl);
@@ -114,57 +107,57 @@ async function receiveMessage(content, roomName, sender) {
   if (contentType.startsWith('image/')) {
     msg.className = 'image-message';
     msg.innerHTML = realText.length > 0 ? 
-      `<div class="chat-message">${realText}</div>
-      <img src="${objectUrl}" alt="User sent image" class="image-message" onerror="this.onerror=null; this.src='/cdn/images/error.png';">` : 
-      `<img src="${objectUrl}" alt="User sent image" class="image-message" onerror="this.onerror=null; this.src='/cdn/images/error.png';">`;
+      <div class="chat-message">${realText}</div>
+      <img src="${objectUrl}" alt="User sent image" class="image-message" onerror="this.onerror=null; this.src='/cdn/images/error.png';"> : 
+      <img src="${objectUrl}" alt="User sent image" class="image-message" onerror="this.onerror=null; this.src='/cdn/images/error.png';">;
   } else if (contentType.startsWith('audio/')) {
     msg.className = 'audio-message';
     msg.innerHTML = realText.length > 0 ? 
-      `<div class="chat-message">${realText}</div>
+      <div class="chat-message">${realText}</div>
       <audio controls>
         <source src="${objectUrl}" type="${contentType}">
         Your browser does not support the audio element.
-      </audio>` : 
-      `<audio controls>
+      </audio> : 
+      <audio controls>
         <source src="${objectUrl}" type="${contentType}">
         Your browser does not support the audio element.
-      </audio>`;
+      </audio>;
   } else if (contentType === 'text/html-link') {
     msg.innerHTML = realText.length > 0 ? 
-      `<div class="chat-message">${realText}</div>
-      <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>` : 
-      `<a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>`;
+      <div class="chat-message">${realText}</div>
+      <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a> : 
+      <a href="${objectUrl}" target="_blank" rel="noopener noreferrer">${objectUrl}</a>;
   } else if (contentType.startsWith('video/')) {
     msg.className = 'video-message';
     msg.innerHTML = realText.length > 0 ? 
-      `<div class="chat-message">${realText}</div>
+      <div class="chat-message">${realText}</div>
       <video controls width="300">
         <source src="${objectUrl}" type="${contentType}">
         Your browser does not support the video tag.
-      </video>` : 
-      `<video controls width="300">
+      </video> : 
+      <video controls width="300">
         <source src="${objectUrl}" type="${contentType}">
         Your browser does not support the video tag.
-      </video>`;
+      </video>;
   } else if (contentType === 'application/pdf') {
     msg.className = 'pdf-message';
     msg.innerHTML = realText.length > 0 ? 
-      `<div class="chat-message">${realText}</div>
-      <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>` : 
-      `<iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>`;
+      <div class="chat-message">${realText}</div>
+      <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe> : 
+      <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>;
   } else if (contentType === 'text/html') {
-    const isAllowed = confirm('This is an external or untrusted page. Do you want to continue?');
+  const isAllowed = confirm('This is an external or untrusted page. Do you want to continue?');
   
-    if (isAllowed) {
-      msg.innerHTML = realText.length > 0 ? 
-        `<div class="chat-message">${realText}</div>` : '';
-    } else {
-      msg.innerHTML = `<div class="chat-message">Link blocked</div>`;
-    }
-  } else {
+  if (isAllowed) {
     msg.innerHTML = realText.length > 0 ? 
-      `<div class="chat-message">${realText}</div>` : '';
+      <div class="chat-message">${realText}</div> : '';
+  } else {
+    msg.innerHTML = <div class="chat-message">Link blocked</div>;
   }
+} else {
+  msg.innerHTML = realText.length > 0 ? 
+    <div class="chat-message">${realText}</div> : '';
+}
 }
 
 document.addEventListener('visibilitychange', function() {
