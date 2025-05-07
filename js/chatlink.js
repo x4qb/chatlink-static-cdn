@@ -79,21 +79,25 @@ async function connectWebSocket(roomName) {
   };
 }
 
-async function receiveMessage(content, roomName) {
+async function receiveMessage(content, roomName, sender) {
   const messagesContainer = document.getElementById('messages');
   const msgWrapper = document.createElement('div');
   msgWrapper.className = 'chat-message-wrapper';
-  
-  const avatar = document.createElement('img');
-  avatar.src = '/favicon.ico';
-  avatar.className = 'avatar';
-  avatar.alt = 'User avatar';
-  msgWrapper.appendChild(avatar);
 
   const msg = document.createElement('div');
   msg.className = 'chat-message';
-  msg.innerHTML = convertUrlsToLinks(content);
-  msgWrapper.appendChild(msg);
+  
+  const username = document.createElement('div');
+  username.className = 'username';
+  username.textContent = 'Chatlinker";
+  
+  const messageContent = document.createElement('div');
+  messageContent.className = 'message-content';
+  messageContent.innerHTML = convertUrlsToLinks(content);
+  
+  msgWrapper.appendChild(username);
+  msgWrapper.appendChild(messageContent);
+  
   messagesContainer.appendChild(msgWrapper);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
