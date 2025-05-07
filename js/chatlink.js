@@ -186,22 +186,19 @@ async function loadPriorMessages(roomName) {
 }
 
 function convertUrlsToLinks(text) {
-  const urlPattern = /(\b(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*)|(\b(?:www\.)[^\s/$.?#].[^\s]*)|(\b[^\s]+\.[a-z]{2,}\b)/gi;
+  const urlPattern = /(\b(?:https?|ftp):\/\/[^\s]+)|(\bwww\.[^\s]+)|(\b[a-z0-9.-]+\.[a-z]{2,}(?:\/[^\s]*)?)/gi;
 
-  return text.replace(urlPattern, (url) => {
-    if (url.startsWith('www')) {
+  return text.replace(urlPattern, (match) => {
+    let url = match;
+
+    if (url.startsWith('www.')) {
       url = 'https://' + url;
-    }
-    else if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    } else if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('ftp://')) {
       url = 'https://' + url;
     }
 
     if (url.startsWith('https://chatlink.space')) {
       return `<a href="${url}" target="_blank" rel="noopener noreferrer">Chatlink</a>`;
-    }
-
-    if (url.match(/https?:\/\/[^\s/$.?#].[^\s]*\/[^\s]*/)) {
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url.replace(/^https?:\/\//, '')}</a>`;
     }
 
     return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url.replace(/^https?:\/\//, '')}</a>`;
