@@ -90,8 +90,6 @@ async function receiveMessage(content, roomName, sender) {
   const messageContent = document.createElement('div');
   messageContent.className = 'chat-message';
   messageContent.innerHTML = convertUrlsToLinks(content);
-  
-  msgWrapper.appendChild(username);
   msgWrapper.appendChild(messageContent);
   
   messagesContainer.appendChild(msgWrapper);
