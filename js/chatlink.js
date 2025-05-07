@@ -11,11 +11,11 @@ async function returnContentType(url) {
     if (response.ok) {
       return response.headers.get('Content-Type');
     } else {
-      console.error('Failed to fetch content type:', response.status, response.statusCode);
+      console.error('failed content type fetch', response.status, response.statusCode);
       return null;
     }
   } catch (error) {
-    console.error('Error fetching content type:', error);
+    console.error('error content type fetch', error);
     return null;
   }
 }
@@ -71,11 +71,11 @@ async function connectWebSocket(roomName) {
   };
 
   socket.onerror = (error) => {
-    console.error('WebSocket error:', error);
+    console.error('Chatlink connectivity error:', error);
   };
 
   socket.onclose = () => {
-    console.log('WebSocket connection closed');
+    console.log('Connection to Chatlink expired. Reload');
   };
 }
 
@@ -92,7 +92,7 @@ async function receiveMessage(content, roomName) {
   if (!firstUrl) return;
 
   if (document.visibilityState !== 'visible') {
-    const notifAudio = new Audio('/cdn/media/receivednotif.mp3');
+    const notifAudio = new Audio('https://cdn.chatlink.space/audios/receivednotif.mp3');
     notifAudio.play();
     unread += 1;
     document.title = `(${unread}) Chatlink - ${roomName}`;
@@ -145,15 +145,12 @@ async function receiveMessage(content, roomName) {
       <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>` : 
       `<iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>`;
   } else if (contentType === 'text/html') {
-  // Always prompt the user before allowing navigation
   const isAllowed = confirm('This is an external or untrusted page. Do you want to continue?');
   
   if (isAllowed) {
-    // If the user clicks "Yes", display the link content
     msg.innerHTML = realText.length > 0 ? 
       `<div class="chat-message">${realText}</div>` : '';
   } else {
-    // If the user clicks "No", you can show a warning or do nothing
     msg.innerHTML = `<div class="chat-message">Link blocked</div>`;
   }
 } else {
@@ -207,7 +204,7 @@ function convertUrlsToLinks(text) {
     }
 
     if (url.startsWith('https://chatlink.space/rooms/')) {
-      const roomName = url.split('/rooms/')[1].split('/')[0];  // Extract room name from URL
+      const roomName = url.split('/rooms/')[1].split('/')[0];
       const displayText = `Chatlink Room - ${roomName}`;
       return `<a href="${url}" target="_blank" rel="noopener noreferrer">${displayText}</a>`;
     }

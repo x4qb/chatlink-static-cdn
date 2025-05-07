@@ -44,11 +44,11 @@ async function uploadFile(file) {
                 const textToInsert = data.link;
                 messageInput.value = currentText + textToInsert;
             }
-            console.log('File uploaded', data);
+            console.log('up');
         } else {
-            console.error('Upload failed', response.statusText);
+            console.error('failed up', response.statusText);
         }
     } catch (error) {
-        console.error('Upload error', error);
+        console.error('up err', error);
     }
 }

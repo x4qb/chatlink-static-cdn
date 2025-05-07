@@ -153,3 +153,17 @@ body {
 #imageInput {
   display: none;
 }
+
+.chat-message-wrapper {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+}
+
+.avatar {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	object-fit: cover;
+	flex-shrink: 0;
+}
