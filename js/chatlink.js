@@ -197,7 +197,13 @@ function convertUrlsToLinks(text) {
       url = 'https://' + url;
     }
 
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    if (url.startsWith('https://chatlink.space/rooms/')) {
+      const roomName = url.split('/rooms/')[1];
+      const displayText = `Chatlink Room - ${roomName}`;
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${displayText}</a>`;
+    }
+
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url.replace(/^https?:\/\//, '')}</a>`;
   });
 }
 
