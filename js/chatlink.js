@@ -86,16 +86,6 @@ async function receiveMessage(content, roomName, sender) {
 
   const msg = document.createElement('div');
   msg.className = 'chat-message';
-
-  const avatar = document.createElement('img');
-  avatar.src = '/favicon.ico';
-  avatar.className = 'avatar';
-  avatar.alt = 'User avatar';
-  msgWrapper.appendChild(avatar);
-  
-  const username = document.createElement('div');
-  username.className = 'username';
-  username.textContent = 'Chatlinker';
   
   const messageContent = document.createElement('div');
   messageContent.className = 'chat-message';
