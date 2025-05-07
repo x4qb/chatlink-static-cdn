@@ -198,6 +198,11 @@ function convertUrlsToLinks(text) {
     }
 
     if (url.startsWith('https://chatlink.space')) {
+      const roomMatch = url.match(/^https:\/\/chatlink\.space\/rooms\/([^\/\s]+)/);
+      if (roomMatch) {
+        const roomName = roomMatch[1];
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">Chatlink - ${roomName}</a>`;
+      }
       return `<a href="${url}" target="_blank" rel="noopener noreferrer">Chatlink</a>`;
     }
 
