@@ -83,10 +83,9 @@ async function receiveMessage(content, roomName) {
   const messagesContainer = document.getElementById('messages');
   const msgWrapper = document.createElement('div');
   msgWrapper.className = 'chat-message-wrapper';
-
-  // Add the avatar image to the left
+  
   const avatar = document.createElement('img');
-  avatar.src = 'https://via.placeholder.com/40'; // Replace with the user's actual avatar URL
+  avatar.src = '/favicon.ico';
   avatar.className = 'avatar';
   avatar.alt = 'User avatar';
   msgWrapper.appendChild(avatar);
