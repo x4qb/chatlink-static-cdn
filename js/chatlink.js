@@ -203,6 +203,9 @@ function convertUrlsToLinks(text) {
         const roomName = roomMatch[1];
         return `<a href="${url}" target="_blank" rel="noopener noreferrer">Chatlink - ${roomName}</a>`;
       }
+      if (url === 'https://chatlink.space/draw') {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">Play Chatlink Draw!</a>`;
+      }
       return `<a href="${url}" target="_blank" rel="noopener noreferrer">Chatlink</a>`;
     }
 
