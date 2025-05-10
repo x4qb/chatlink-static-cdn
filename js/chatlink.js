@@ -2,12 +2,6 @@ let unread = 0;
 let roomNameVar;
 let socket;
 
-let messageOffset = 0;
-const messageLimit = 20;
-let loadingOlderMessages = false;
-let allMessagesLoaded = false;
-
-
 async function returnContentType(url) {
   try {
     const response = await fetch(url, {
@@ -66,9 +60,9 @@ async function connectWebSocket(roomName) {
   socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
-    console.log('%c⚠ WARNING! ⚠\nDo NOT paste code you don\'t understand or trust here.\nIt may give attackers access to your account or data.', 'color: red; font-size: 16px; font-weight: bold;');
+    console.log('%câš  WARNING! âš \nDo NOT paste code you don\'t understand or trust here.\nIt may give attackers access to your account or data.', 'color: red; font-size: 16px; font-weight: bold;');
     console.log('Chatlink connectivity finished');
-    loadPriorMessages(roomName, messageOffset);
+    loadPriorMessages(roomName);
   };
 
   socket.onmessage = (event) => {
@@ -90,17 +84,13 @@ async function connectWebSocket(roomName) {
   };
 }
 
-async function receiveMessage(content, roomName, prepend = false) {
+async function receiveMessage(content, roomName) {
   const messagesContainer = document.getElementById('messages');
   const msg = document.createElement('div');
   msg.className = 'chat-message';
   msg.innerHTML = convertUrlsToLinks(content);
-  if (prepend) {
-    messagesContainer.prepend(msg);
-  } else {
-    messagesContainer.appendChild(msg);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  }
+  messagesContainer.appendChild(msg);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
   const realText = content.replace(/https?:\/\/[^\s]+/g, '').trim();
   const firstUrl = extractFirstUrl(content);
@@ -173,46 +163,32 @@ document.addEventListener('visibilitychange', function() {
   }
 });
 
-async function loadPriorMessages(roomName, offset = 0) {
-  if (loadingOlderMessages || allMessagesLoaded) return;
-
-  loadingOlderMessages = true;
-
+async function loadPriorMessages(roomName) {
   try {
-    const response = await fetch(`https://chatlink.space/messages/room/${roomName}?offset=${offset}&limit=${messageLimit}`, {
+    const response = await fetch(`https://chatlink.space/messages/room/${roomName}`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
-    if (!response.ok) throw new Error('Failed to fetch prior messages');
+    if (!response.ok) {
+      throw new Error('Failed to fetch prior messages');
+    }
 
     const responseData = await response.json();
 
     if (responseData.length === 0) {
-      allMessagesLoaded = true;
-      return;
+      receiveMessage("It seems like there are no previous messages in this chatroom. Start the conversation!", roomName);
     }
 
-    const container = document.getElementById('messages');
-    const scrollBottom = container.scrollHeight - container.scrollTop;
-
-    for (let i = responseData.length - 1; i >= 0; i--) {
-      const msg = document.createElement('div');
-      msg.className = 'chat-message';
-      msg.innerHTML = convertUrlsToLinks(responseData[i].content);
-      container.prepend(msg);
+    for (const msg of responseData) {
+      await receiveMessage(msg.content, roomName);
     }
-
-    container.scrollTop = container.scrollHeight - scrollBottom;
-
-    messageOffset += messageLimit;
   } catch (error) {
     console.error('Error loading messages:', error);
-  } finally {
-    loadingOlderMessages = false;
   }
 }
-
 
 function convertUrlsToLinks(text) {
   const urlPattern = /(\b(?:https?|ftp):\/\/[^\s]+)|(\bwww\.[^\s]+)|(\b[a-z0-9.-]+\.[a-z]{2,}(?:\/[^\s]*)?)/gi;
@@ -283,15 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!content) return;
     bcMessage(roomName);
   });
-
-  const messagesContainer = document.getElementById('messages');
-messagesContainer.addEventListener('scroll', async () => {
-  if (messagesContainer.scrollTop === 0 && !loadingOlderMessages && !allMessagesLoaded) {
-    await loadPriorMessages(roomNameVar, messageOffset);
-  }
-});
-
-
 
   document.getElementById('messageInput').addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
