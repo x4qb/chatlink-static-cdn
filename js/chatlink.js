@@ -62,7 +62,7 @@ async function connectWebSocket(roomName) {
   socket.onopen = () => {
     console.log('%c⚠ WARNING! ⚠\nDo NOT paste code you don\'t understand or trust here.\nIt may give attackers access to your account or data.', 'color: red; font-size: 16px; font-weight: bold;');
     console.log('Chatlink connectivity finished');
-    loadPriorMessages(roomName);
+    loadPriorMessages(roomName, false);
   };
 
   socket.onmessage = (event) => {
@@ -84,13 +84,17 @@ async function connectWebSocket(roomName) {
   };
 }
 
-async function receiveMessage(content, roomName) {
+async function receiveMessage(content, roomName, prepend = false) {
   const messagesContainer = document.getElementById('messages');
   const msg = document.createElement('div');
   msg.className = 'chat-message';
   msg.innerHTML = convertUrlsToLinks(content);
-  messagesContainer.appendChild(msg);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  if (prepend) {
+    messagesContainer.prepend(msg);
+  } else {
+    messagesContainer.appendChild(msg);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
 
   const realText = content.replace(/https?:\/\/[^\s]+/g, '').trim();
   const firstUrl = extractFirstUrl(content);
@@ -163,30 +167,43 @@ document.addEventListener('visibilitychange', function() {
   }
 });
 
-async function loadPriorMessages(roomName) {
+let messageOffset = 0;
+const messageLimit = 20;
+let isLoading = false;
+let hasMoreMessages = true;
+
+async function loadPriorMessages(roomName, append = false) {
+  if (isLoading || !hasMoreMessages) return;
+  isLoading = true;
+
   try {
-    const response = await fetch(`https://chatlink.space/messages/room/${roomName}`, {
+    const response = await fetch(`https://chatlink.space/messages/room/${roomName}?offset=${messageOffset}&limit=${messageLimit}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch prior messages');
+    if (!response.ok) throw new Error('Failed to fetch prior messages');
+
+    const messages = await response.json();
+    if (messages.length < messageLimit) hasMoreMessages = false;
+
+    const container = document.getElementById('messages');
+    const previousScrollHeight = container.scrollHeight;
+
+    for (const msg of messages.reverse()) {
+      await receiveMessage(msg.content, roomName, true); // `true` for prepend
     }
 
-    const responseData = await response.json();
-
-    if (responseData.length === 0) {
-      receiveMessage("It seems like there are no previous messages in this chatroom. Start the conversation!", roomName);
+    if (append) {
+      // Maintain scroll position after prepend
+      container.scrollTop = container.scrollHeight - previousScrollHeight;
     }
 
-    for (const msg of responseData) {
-      await receiveMessage(msg.content, roomName);
-    }
-  } catch (error) {
-    console.error('Error loading messages:', error);
+    messageOffset += messages.length;
+  } catch (err) {
+    console.error('Error loading paginated messages:', err);
+  } finally {
+    isLoading = false;
   }
 }
 
@@ -259,6 +276,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!content) return;
     bcMessage(roomName);
   });
+
+  document.getElementById('messages').addEventListener('scroll', function () {
+  if (this.scrollTop === 0 && !isLoading && hasMoreMessages) {
+    const pathParts = window.location.pathname.split('/');
+    const roomName = pathParts[pathParts.length - 1];
+    loadPriorMessages(roomName, true); // `true` = paginated scroll loading
+  }
+});
+
 
   document.getElementById('messageInput').addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
