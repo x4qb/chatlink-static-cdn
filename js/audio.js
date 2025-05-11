@@ -3,7 +3,7 @@ ambience.loop = true;
 ambience.volume = 0.25;
 
 ambience.play().catch(() => {
-  console.warn('blocked ap. waiting for interaction..');
+  console.warn('blocked ap. waiting for interaction...');
 });
 
 document.addEventListener('click', () => {
