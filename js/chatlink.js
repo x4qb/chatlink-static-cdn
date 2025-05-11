@@ -78,9 +78,14 @@ async function connectWebSocket(roomName) {
     console.log('Connection to Chatlink expired. Reload');
     document.getElementById("messageInput").disabled = true;
     document.getElementById("imageInput").disabled = true;
-    document.getElementById("messageInput").placeholder = "Chatlink connection closed. Reload the page to continue talking!"
-    document.getElementById("messageInput").style.cursor = "not-allowed";
+    document.getElementById("messageInput").placeholder = "Chatlink connection closed. Click here to reload the page to continue talking!"
+    document.getElementById("messageInput").style.cursor = "pointer";
+    document.getElementById("messageInput").readOnly = true;
     document.getElementById("imageInput").style.cursor = "not-allowed";
+
+    document.getElementById("messageInput").addEventListener("click", function() {
+      window.location.reload();
+    });
   };
 }
 
