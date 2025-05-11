@@ -45,6 +45,7 @@ body {
 	word-wrap: break-word;
 	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 	animation: popIn 0.3s ease forwards;
+	color: #ffffff;
 }
 
 .chat-input {
