@@ -37,7 +37,7 @@ body {
 }
 
 .chat-message {
-	background: linear-gradient(135deg, #b7f0e7, #e0f7fa);
+	background: #40404040;
 	border-radius: 15px;
 	padding: 10px 15px;
 	margin-bottom: 10px;
@@ -59,10 +59,11 @@ body {
 	border: 1px solid #ccc;
 	margin-right: 10px;
 	margin-left: 10px;
+	background: #5d5d5d70
 }
 
 .chat-input button {
-	background-color: #007bff;
+	background-color: #ffffff70;
 	border: none;
 	color: white;
 	padding: 10px;
