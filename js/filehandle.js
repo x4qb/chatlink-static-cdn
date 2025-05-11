@@ -33,7 +33,7 @@ async function uploadFile(file) {
     const formData = new FormData();
     formData.append('file', file);
     try {
-        const response = await fetch('https://chatlink.space/api/cdn/up', {
+        const response = await fetch('https://chatlink.space/api/internalusercontent/upload', {
             method: 'POST',
             body: formData
         });
