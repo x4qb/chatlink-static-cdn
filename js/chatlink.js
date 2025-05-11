@@ -57,7 +57,7 @@ async function connectWebSocket(roomName) {
   roomNameVar = roomName;
   const wsUrl = `wss://chatlink.space/messagerouting/websocket/connection?room=${roomName}`;
 
-  window.socket = new WebSocket(wsUrl);
+  socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
     console.log('%câš  WARNING! âš \nDo NOT paste code you don\'t understand or trust here.\nIt may give attackers access to your account or data.', 'color: red; font-size: 16px; font-weight: bold;');
