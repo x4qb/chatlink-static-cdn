@@ -76,7 +76,6 @@ async function connectWebSocket(roomName) {
 
   socket.onclose = () => {
     console.log('Connection to Chatlink expired. Reload');
-    document.getElementById("messageInput").disabled = true;
     document.getElementById("imageInput").disabled = true;
     document.getElementById("messageInput").placeholder = "Chatlink connection closed. Click here to reload the page to continue talking!"
     document.getElementById("messageInput").style.cursor = "pointer";
