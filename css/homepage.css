@@ -33,7 +33,7 @@ body {
 }
 
 .chat-message {
-	background: linear-gradient(135deg, #b7f0e7, #e0f7fa);
+	background: #40404040;
 	border-radius: 15px;
 	padding: 10px 15px;
 	margin-bottom: 10px;
