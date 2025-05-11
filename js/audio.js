@@ -65,3 +65,16 @@ attachMediaListeners();
 
 const observer = new MutationObserver(attachMediaListeners);
 observer.observe(document.body, { childList: true, subtree: true });
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (!ambience.paused) {
+      ambience.pause();
+    }
+  } else {
+    if (ambience.paused) {
+      ambience.volume = 0;
+      ambience.play().then(() => fadeInAmbience());
+    }
+  }
+});
