@@ -1,6 +1,6 @@
 const ambience = new Audio('https://cdn.chatlink.space/audios/ambience.mp3');
 ambience.loop = true;
-ambience.volume = 0.5;
+ambience.volume = 0.25;
 
 ambience.play().catch(() => {
   console.warn('blocked ap. waiting for interaction..');
@@ -27,14 +27,14 @@ function handlePauseEvent() {
   const othersPlaying = mediaElements.some(isMediaPlaying);
 
   if (!othersPlaying && ambience.paused) {
-    ambience.volume = 0; // Start muted for fade-in
+    ambience.volume = 0;
     ambience.play().then(() => fadeInAmbience());
   }
 }
 
 function fadeInAmbience() {
   let volume = 0;
-  const targetVolume = 0.5;
+  const targetVolume = 0.25;
   const step = 0.01;
   const interval = 30;
 
