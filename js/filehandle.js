@@ -15,7 +15,7 @@ imageInput.addEventListener('change', async (event) => {
 });
 messagesContainer.addEventListener('dragover', (e) => {
     e.preventDefault();
-    messagesContainer.style.backgroundColor = '#f0f0f0';
+    messagesContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
 });
 messagesContainer.addEventListener('dragleave', (e) => {
     e.preventDefault();
