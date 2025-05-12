@@ -103,7 +103,6 @@ async function receiveMessage(content, roomName, self) {
   const firstUrl = extractFirstUrl(content);
   if (!firstUrl) return;
 
-  // Passive media loading
   (async () => {
     const resource = await fetchResource(firstUrl);
     if (!resource) return;
