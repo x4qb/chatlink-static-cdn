@@ -88,7 +88,7 @@ async function connectWebSocket(roomName) {
   };
 }
 
-async function receiveMessage(content, roomName, self) {
+async function receiveMessage(content, roomName, from) {
   const messagesContainer = document.getElementById('messages');
   const msg = document.createElement('div');
   msg.className = 'chat-message';
@@ -102,6 +102,11 @@ async function receiveMessage(content, roomName, self) {
 
   const resource = await fetchResource(firstUrl);
   if (!resource) return;
+
+  let self = false
+  if (from === true) {
+    self = true
+  }
 
   const { contentType, objectUrl } = resource;
 
