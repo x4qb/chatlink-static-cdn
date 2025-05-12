@@ -88,7 +88,7 @@ async function connectWebSocket(roomName) {
   };
 }
 
-async function receiveMessage(content, roomName) {
+async function receiveMessage(content, roomName, self) {
   const messagesContainer = document.getElementById('messages');
   const msg = document.createElement('div');
   msg.className = 'chat-message';
@@ -147,17 +147,21 @@ async function receiveMessage(content, roomName) {
       <iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>` : 
       `<iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>`;
   } else if (contentType === 'text/html') {
-    const isAllowed = confirm('This is an external or untrusted page. Do you want to continue?');
-    
-    if (isAllowed) {
+    if (self === true) {
       msg.innerHTML = realText.length > 0 ? 
-        `<div class="chat-message">${realText}</div>` : '';
+        `<div class="chat-message sent">${realText}</div>` : '';
     } else {
-      msg.innerHTML = `<div class="chat-message">Link blocked</div>`;
+      msg.innerHTML = realText.length > 0 ? 
+        `<div class="chat-message received">${realText}</div>` : '';
     }
   } else {
-    msg.innerHTML = realText.length > 0 ? 
-      `<div class="chat-message">${realText}</div>` : '';
+    if (self === true) {
+      msg.innerHTML = realText.length > 0 ? 
+      `<div class="chat-message sent">${realText}</div>` : '';
+    } else {
+       msg.innerHTML = realText.length > 0 ? 
+      `<div class="chat-message received">${realText}</div>` : '';
+    }
   }
 }
 
@@ -244,7 +248,7 @@ async function bcMessage(room) {
   
   if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(content);
-    receiveMessage(content, room);
+    receiveMessage(content, room, true);
     messageInput.value = '';
   } else {
     console.error('WebSocket is not open');
