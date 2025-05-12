@@ -173,7 +173,15 @@ document.addEventListener('visibilitychange', function() {
 
 async function loadPriorMessages(roomName) {
   try {
-    const response = await fetch(`https://chatlink.space/messages/room/${roomName}`, {
+    const params = new URLSearchParams(window.location.search);
+    const limit = params.get('limit');
+    let url = `https://chatlink.space/messages/room/${roomName}`
+      ;
+    if (limit !== null) {
+      url += `?limit=${encodeURIComponent(limit)}`;
+    }
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
