@@ -96,7 +96,7 @@ async function receiveMessage(content, roomName, from) {
   
   const messagesContainer = document.getElementById('messages');
   const msg = document.createElement('div');
-  msg.className = 'chat-message';
+  msg.className = 'chat-message received';
   msg.innerHTML = convertUrlsToLinks(content);
   messagesContainer.appendChild(msg);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -155,17 +155,11 @@ async function receiveMessage(content, roomName, from) {
     if (self === true) {
       msg.innerHTML = realText.length > 0 ? 
         `<div class="chat-message sent">${realText}</div>` : '';
-    } else {
-      msg.innerHTML = realText.length > 0 ? 
-        `<div class="chat-message received">${realText}</div>` : '';
     }
   } else {
     if (self === true) {
       msg.innerHTML = realText.length > 0 ? 
       `<div class="chat-message sent">${realText}</div>` : '';
-    } else {
-       msg.innerHTML = realText.length > 0 ? 
-      `<div class="chat-message received">${realText}</div>` : '';
     }
   }
 }
