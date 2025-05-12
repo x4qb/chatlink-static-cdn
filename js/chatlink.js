@@ -196,7 +196,7 @@ async function loadPriorMessages(roomName) {
     }
 
     for (const msg of responseData) {
-      await receiveMessage(msg.content, roomName);
+      await receiveMessage(msg.content, roomName, false);
     }
   } catch (error) {
     console.error('Error loading messages:', error);
