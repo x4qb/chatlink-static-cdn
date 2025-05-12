@@ -88,15 +88,13 @@ async function connectWebSocket(roomName) {
   };
 }
 
-async function receiveMessage(content, roomName, from) {
-  let self = false
-  if (from === true) {
-    self = true
-  }
-  
+async function receiveMessage(content, roomName, self) {
   const messagesContainer = document.getElementById('messages');
   const msg = document.createElement('div');
   msg.className = 'chat-message received';
+  if (self === true) {
+    msg.className = 'chat-message sent';
+  }
   msg.innerHTML = convertUrlsToLinks(content);
   messagesContainer.appendChild(msg);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -153,13 +151,11 @@ async function receiveMessage(content, roomName, from) {
       `<iframe src="${objectUrl}" width="100%" height="500px" style="border: none;"></iframe>`;
   } else if (contentType === 'text/html') {
     if (self === true) {
-      msg.className = 'chat-message sent';
       msg.innerHTML = realText.length > 0 ? 
         `<div class="chat-message sent">${realText}</div>` : '';
     }
   } else {
     if (self === true) {
-      msg.className = 'chat-message received';
       msg.innerHTML = realText.length > 0 ? 
       `<div class="chat-message sent">${realText}</div>` : '';
     }
