@@ -52,12 +52,12 @@ body {
 
 .chat-message.sent {
   align-self: flex-end;
-  background-color: #d1e7dd;
+  background-color: #ffffff40;
 }
 
 .chat-message.received {
   align-self: flex-start;
-  background-color: #f8d7da;
+  background-color: #40404040;
 }
 
 .chat-input {
