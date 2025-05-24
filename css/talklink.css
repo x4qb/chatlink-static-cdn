@@ -1,0 +1,64 @@
+body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0.5em 0;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 5px;
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+      font-size: 1em;
+    }
+    input::placeholder {
+      color: #888;
+    }
+    input:focus, button:focus {
+      outline: 2px solid #4caf50;
+    }
+    button:hover {
+      background-color: #333;
+      cursor: pointer;
+    }
+    video {
+      width: 45%;
+      height: 350px;
+      margin: 10px;
+      border: 2px solid #444;
+      background-color: #000;
+    }
+    canvas {
+      width: 90%;
+      height: 100px;
+      background-color: #111;
+      display: block;
+      margin: 20px auto;
+      border-radius: 5px;
+    }
+    #incomingCallBanner {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #2e7d32;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      font-size: 1.2em;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.4s ease forwards;
+      z-index: 1000;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; top: 0px; }
+      to { opacity: 1; top: 10px; }
+    }
