@@ -4,4 +4,4 @@ const targetText = document.getElementById("targetId");
 
 const target = params.get('target');
 
-targetText.textContent = target;
+targetText.value = target;
