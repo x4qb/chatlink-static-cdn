@@ -55,7 +55,7 @@ function extractFirstUrl(content) {
 
 async function connectWebSocket(roomName) {
   roomNameVar = roomName;
-  const wsUrl = `wss://chatlink.space/messagerouting/websocket/connection?room=${roomName}`;
+  const wsUrl = `wss://rt.chatlink.space/messagerouting/websocket/connection?room=${roomName}`;
 
   socket = new WebSocket(wsUrl);
 
