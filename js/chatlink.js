@@ -175,7 +175,7 @@ async function loadPriorMessages(roomName) {
   try {
     const params = new URLSearchParams(window.location.search);
     const limit = params.get('limit');
-    let url = `https://chatlink.space/messages/room/${roomName}`
+    let url = `https://rt.chatlink.space/messages/room/${roomName}`
       ;
     if (limit !== null) {
       url += `?limit=${encodeURIComponent(limit)}`;
